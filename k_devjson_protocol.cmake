@@ -53,6 +53,7 @@ function (k_devjson_protocol_create_mock_library)
     add_library(k_devjson_protocol_mock ${CMAKE_CURRENT_LIST_DIR}/mock/k_devjson_protocol_mock.c)
     target_include_directories(k_devjson_protocol_mock PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
     target_include_directories(k_devjson_protocol_mock PRIVATE ${CMAKE_CURRENT_LIST_DIR}/mock)
+    target_link_libraries(k_devjson_protocol_mock PUBLIC k_cjson)
 endfunction()
 
 function(k_devjson_protocol_create_dep_libraries)

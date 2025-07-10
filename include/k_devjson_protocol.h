@@ -111,6 +111,16 @@ void k_devjson_protocol_register_callback(k_devjson_protocol_callback_t callback
  */
 k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_string, char *output_string, size_t output_string_size);
 
+/**
+ * @brief Add a response to the output JSON object
+ *
+ * This function adds a key-value pair to the output JSON object based on the provided value type.
+ *
+ * @param output_json Pointer to the output JSON object where the response will be added.
+ * @param key Pointer to the key string for the JSON object.
+ * @param value The value to be added, which can be of different types.
+ * @param value_type The type of the value being added.
+ */
 void k_devjson_protocol_add_response(cJSON *output_json, const char *key, k_devjson_protocol_value_t value, k_devjson_protocol_value_type_t value_type);
 
 #ifdef __cplusplus
