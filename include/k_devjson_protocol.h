@@ -23,7 +23,8 @@ typedef enum
 	K_DEVJSON_PROTOCOL_VALUE_TYPE_INTEGER,	//!< Integer value
 	K_DEVJSON_PROTOCOL_VALUE_TYPE_FLOAT,	//!< Float value
 	K_DEVJSON_PROTOCOL_VALUE_TYPE_STRING,	//!< String value
-	K_DEVJSON_PROTOCOL_VALUE_TYPE_JSON,		//!< JSON value
+	K_DEVJSON_PROTOCOL_VALUE_TYPE_BOOL,		//!< Bool value
+	K_DEVJSON_PROTOCOL_VALUE_TYPE_JSON,		//!< JSON value (cJSON object)
 	K_DEVJSON_PROTOCOL_VALUE_TYPE_UNKNOWN	//!< Unknown value
 } k_devjson_protocol_value_type_t;
 
@@ -32,6 +33,7 @@ typedef enum
  */
 typedef enum
 {
+	K_DEVJSON_PROTOCOL_GROUP_TYPE_ID,	//<!< Group for ID
 	K_DEVJSON_PROTOCOL_GROUP_TYPE_GET,	//<!< Group for GET requests
 	K_DEVJSON_PROTOCOL_GROUP_TYPE_SET,	//!< Group for SET requests
 	K_DEVJSON_PROTOCOL_GROUP_TYPE_CMD,	//!< Group for CMD requests
@@ -40,9 +42,10 @@ typedef enum
 typedef union
 {
 	char  *string_value;  //!< String value
+	cJSON *json_value;	  //!< Bool value
 	int	   int_value;	  //!< Integer value
+	int	   bool_value;	  //!< Bool value
 	float  float_value;	  //!< Float value
-	cJSON *json_value;	  //!< JSON value (cJSON object)
 } k_devjson_protocol_value_t;
 
 /**
@@ -66,6 +69,7 @@ typedef struct
 typedef enum
 {
 	K_DEVJSON_PROTOCOL_PARSE_SUCCESS,	   //!< Parsing was successful
+	K_DEVJSON_PROTOCOL_PARSE_WRONG_ID,	   //!< Wrong ID in devJSON protocol
 	K_DEVJSON_PROTOCOL_PARSE_ERROR,		   //!< Error occurred during parsing
 	K_DEVJSON_PROTOCOL_PARSE_INVALID_JSON  //!< Invalid JSON format
 } k_devjson_protocol_parse_status_t;
@@ -101,9 +105,11 @@ void k_devjson_protocol_register_callback(k_devjson_protocol_callback_t callback
  * callback for each key-value pair in the JSON object.
  *
  * @param json_string Pointer to the JSON string to be parsed.
+ * @param output_string Pointer to a buffer where the output JSON string will be stored.
+ * @param output_string_size Size of the output string buffer.
  * @return k_devjson_protocol_parse_status_t Status of the parsing operation.
  */
-k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_string);
+k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_string, char *output_string, size_t output_string_size);
 
 void k_devjson_protocol_add_response(cJSON *output_json, const char *key, k_devjson_protocol_value_t value, k_devjson_protocol_value_type_t value_type);
 
