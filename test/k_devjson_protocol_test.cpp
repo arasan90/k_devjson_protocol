@@ -329,3 +329,23 @@ TEST(KDevJsonProtocol, IDRequiredParseSuccessWithNoID)
 	k_devjson_protocol_parse_status_t status = k_devjson_protocol_parse(json_string.c_str(), output_string, sizeof(output_string), 1);
 	EXPECT_EQ(status, K_DEVJSON_PROTOCOL_PARSE_WRONG_ID);
 }
+
+TEST(KDevJsonProtocol, IDNotRequiredParseSuccessWithBroadcastID)
+{
+	std::string json_string = R"({"id": 255, "req":{"get": ["key1", "key2"], "set": {"key1": "value1"}, "cmd": {"c1": true, "c5":{"key1":2}}}})";
+	k_devjson_protocol_register_callback(k_devjson_protocol_callback);
+	char							  output_string[1024] = {0};
+	k_devjson_protocol_parse_status_t status			  = k_devjson_protocol_parse(json_string.c_str(), output_string, sizeof(output_string), 0);
+	EXPECT_EQ(status, K_DEVJSON_PROTOCOL_PARSE_SUCCESS);
+	EXPECT_STREQ(output_string, "");
+}
+
+TEST(KDevJsonProtocol, IDRequiredParseSuccessWithBroadcastID)
+{
+	std::string json_string = R"({"id": 255, "req":{"get": ["key1", "key2"], "set": {"key1": "value1"}, "cmd": {"c1": true, "c5":{"key1":2}}}})";
+	k_devjson_protocol_register_callback(k_devjson_protocol_callback);
+	char							  output_string[1024] = {0};
+	k_devjson_protocol_parse_status_t status			  = k_devjson_protocol_parse(json_string.c_str(), output_string, sizeof(output_string), 1);
+	EXPECT_EQ(status, K_DEVJSON_PROTOCOL_PARSE_SUCCESS);
+	EXPECT_STREQ(output_string, "");
+}

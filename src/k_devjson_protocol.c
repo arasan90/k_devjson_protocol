@@ -22,6 +22,8 @@ const char *k_devjson_protocol_get_key = "get";	 //!< Key for the GET group in D
 const char *k_devjson_protocol_set_key = "set";	 //!< Key for the SET group in DevJSON protocol
 const char *k_devjson_protocol_cmd_key = "cmd";	 //!< Key for the CMD group in DevJSON protocol
 
+const int broadcast_id = 0xFF;	//!< Broadcast ID for DevJSON protocol
+
 /* Variable ------------------------------------------------------------------*/
 k_devjson_protocol_callback_t k_devjson_protocol_callback = NULL;  //!< Global callback function for DevJSON protocol
 
@@ -34,9 +36,10 @@ void k_devjson_protocol_register_callback(k_devjson_protocol_callback_t callback
 k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_string, char *output_string, const size_t output_string_size,
 														   const size_t is_id_required)
 {
-	k_devjson_protocol_parse_status_t parse_status	= K_DEVJSON_PROTOCOL_PARSE_ERROR;
-	cJSON							 *output_json	= cJSON_CreateObject();
-	int								  is_id_correct = !is_id_required;	//!< If ID is required, we cannot assume it's correct yet
+	k_devjson_protocol_parse_status_t parse_status		   = K_DEVJSON_PROTOCOL_PARSE_ERROR;
+	cJSON							 *output_json		   = cJSON_CreateObject();
+	int								  is_id_correct		   = !is_id_required;  //!< If ID is required, we cannot assume it's correct yet
+	int								  is_broadcast_message = 0;				   //<! Flag to indicate if the message is a broadcast message
 	if (k_devjson_protocol_callback)
 	{
 		parse_status = K_DEVJSON_PROTOCOL_PARSE_INVALID_JSON;
@@ -50,10 +53,11 @@ k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_stri
 				{
 					k_devjson_protocol_cb_arg_t id_cb_arg = {.group_type = K_DEVJSON_PROTOCOL_GROUP_TYPE_ID, .id = id};
 					k_devjson_protocol_callback(&id_cb_arg);
-					if (id == id_cb_arg.id)
+					if (id == id_cb_arg.id || broadcast_id == id)  //!< ID is correct or it's a broadcast message
 					{
 						cJSON_AddNumberToObject(output_json, k_devjson_protocol_id_key, id);  //!< Add the ID to the output JSON
-						is_id_correct = 1;
+						is_id_correct		 = 1;
+						is_broadcast_message = id == broadcast_id;
 					}
 					else
 					{
@@ -91,7 +95,11 @@ k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_stri
 					parse_status = K_DEVJSON_PROTOCOL_PARSE_WRONG_ID;
 				}
 			}
-			cJSON_PrintPreallocated(output_json, output_string, output_string_size, 0);
+			if (!is_broadcast_message)
+			{
+				/* We need to send a reply only if the message is not a broadcast */
+				cJSON_PrintPreallocated(output_json, output_string, output_string_size, 0);
+			}
 			cJSON_Delete(output_json);	//!< Clean up the output JSON object
 			cJSON_Delete(json);
 		}
@@ -149,7 +157,6 @@ cJSON *k_devjson_protocol_get_group(const cJSON *json, k_devjson_protocol_group_
 
 void k_devjson_protocol_process_group_entries(int id, cJSON *output_json, const cJSON *group, k_devjson_protocol_group_type_t group_type)
 {
-	(void)output_json;
 	k_devjson_protocol_cb_arg_t cb_arg = {0};
 	cJSON *group_type_response_json	   = K_DEVJSON_PROTOCOL_GROUP_TYPE_GET == group_type ? cJSON_AddObjectToObject(output_json, k_devjson_protocol_get_key) :
 										 K_DEVJSON_PROTOCOL_GROUP_TYPE_SET == group_type ? cJSON_AddObjectToObject(output_json, k_devjson_protocol_set_key) :
