@@ -107,9 +107,10 @@ void k_devjson_protocol_register_callback(k_devjson_protocol_callback_t callback
  * @param json_string Pointer to the JSON string to be parsed.
  * @param output_string Pointer to a buffer where the output JSON string will be stored.
  * @param output_string_size Size of the output string buffer.
+ * @param is_id_required Flag indicating whether an ID is required in the JSON object.
  * @return k_devjson_protocol_parse_status_t Status of the parsing operation.
  */
-k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_string, char *output_string, size_t output_string_size);
+k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_string, char *output_string, size_t output_string_size, size_t is_id_required);
 
 /**
  * @brief Add a response to the output JSON object
