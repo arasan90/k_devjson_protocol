@@ -31,11 +31,12 @@ void k_devjson_protocol_register_callback(k_devjson_protocol_callback_t callback
 	k_devjson_protocol_callback = callback;	 //!< Register the callback function
 }
 
-k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_string, char *output_string, const size_t output_string_size)
+k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_string, char *output_string, const size_t output_string_size,
+														   const size_t is_id_required)
 {
 	k_devjson_protocol_parse_status_t parse_status	= K_DEVJSON_PROTOCOL_PARSE_ERROR;
 	cJSON							 *output_json	= cJSON_CreateObject();
-	int								  is_id_correct = 1;
+	int								  is_id_correct = !is_id_required;	//!< If ID is required, we cannot assume it's correct yet
 	if (k_devjson_protocol_callback)
 	{
 		parse_status = K_DEVJSON_PROTOCOL_PARSE_INVALID_JSON;
@@ -52,10 +53,10 @@ k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_stri
 					if (id == id_cb_arg.id)
 					{
 						cJSON_AddNumberToObject(output_json, k_devjson_protocol_id_key, id);  //!< Add the ID to the output JSON
+						is_id_correct = 1;
 					}
 					else
 					{
-						parse_status  = K_DEVJSON_PROTOCOL_PARSE_WRONG_ID;
 						is_id_correct = 0;	//!< ID is not correct, set flag to false
 					}
 				}
@@ -84,6 +85,10 @@ k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_stri
 						}
 					}
 					parse_status = K_DEVJSON_PROTOCOL_PARSE_SUCCESS;
+				}
+				else
+				{
+					parse_status = K_DEVJSON_PROTOCOL_PARSE_WRONG_ID;
 				}
 			}
 			cJSON_PrintPreallocated(output_json, output_string, output_string_size, 0);
