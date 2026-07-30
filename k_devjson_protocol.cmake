@@ -13,10 +13,10 @@ set(private_includes
     )
 
 set(public_linked_libs
+    k_cjson
 )
 
 set(private_linked_libs
-    k_cjson
     )
 
 function(k_devjson_protocol_get_sources OUT_VAR)
@@ -50,12 +50,14 @@ function(k_devjson_protocol_get_public_linked_libs OUT_VAR)
 endfunction()
 
 function (k_devjson_protocol_create_mock_library)
-    add_library(k_devjson_protocol_mock ${CMAKE_CURRENT_LIST_DIR}/mock/k_devjson_protocol_mock.c)
-    target_include_directories(k_devjson_protocol_mock PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
-    target_include_directories(k_devjson_protocol_mock PRIVATE ${CMAKE_CURRENT_LIST_DIR}/mock)
+    add_library(k_devjson_protocol_mock ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/mock/k_devjson_protocol_mock.c)
+    target_include_directories(k_devjson_protocol_mock PUBLIC 
+        ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/mock
+        ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/include
+        )
     target_link_libraries(k_devjson_protocol_mock PUBLIC k_cjson)
 endfunction()
 
 function(k_devjson_protocol_create_dep_libraries)
-    add_subdirectory(libs/cjson)
+    add_subdirectory(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/libs/cjson)
 endfunction()
