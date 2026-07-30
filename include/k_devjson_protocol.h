@@ -11,6 +11,9 @@ extern "C"
 #endif
 
 /* Include -------------------------------------------------------------------*/
+#include <stdbool.h>
+#include <stdint.h>
+
 #include "cJSON.h"
 
 /* Macro ---------------------------------------------------------------------*/
@@ -41,11 +44,11 @@ typedef enum
 
 typedef union
 {
-	char  *string_value;  //!< String value
-	cJSON *json_value;	  //!< Bool value
-	int	   int_value;	  //!< Integer value
-	int	   bool_value;	  //!< Bool value
-	float  float_value;	  //!< Float value
+	char  		*string_value;  //!< String value
+	cJSON 		*json_value;	  //!< Bool value
+	uint64_t	int_value;	  //!< Integer value
+	bool	   	bool_value;	  //!< Bool value
+	float  		float_value;	  //!< Float value
 } k_devjson_protocol_value_t;
 
 /**
