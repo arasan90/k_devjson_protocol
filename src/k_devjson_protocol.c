@@ -52,16 +52,15 @@ k_devjson_protocol_parse_status_t k_devjson_protocol_parse(const char *json_stri
 				if (-1 != id)
 				{
 					k_devjson_protocol_cb_arg_t id_cb_arg = {.group_type = K_DEVJSON_PROTOCOL_GROUP_TYPE_ID, .id = id};
-					k_devjson_protocol_callback(&id_cb_arg);
+					if(!is_id_correct)
+					{
+						k_devjson_protocol_callback(&id_cb_arg);
+					}
 					if (id == id_cb_arg.id || broadcast_id == id)  //!< ID is correct or it's a broadcast message
 					{
 						cJSON_AddNumberToObject(output_json, k_devjson_protocol_id_key, id);  //!< Add the ID to the output JSON
 						is_id_correct		 = 1;
 						is_broadcast_message = id == broadcast_id;
-					}
-					else
-					{
-						is_id_correct = 0;	//!< ID is not correct, set flag to false
 					}
 				}
 				if (is_id_correct)
