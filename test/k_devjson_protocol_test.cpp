@@ -289,7 +289,8 @@ TEST(KDevJsonProtocol, IDNotRequiredParseSuccessWithWrongID)
 	k_devjson_protocol_register_callback(k_devjson_protocol_callback);
 	char							  output_string[1024];
 	k_devjson_protocol_parse_status_t status = k_devjson_protocol_parse(json_string.c_str(), output_string, sizeof(output_string), 0);
-	EXPECT_EQ(status, K_DEVJSON_PROTOCOL_PARSE_WRONG_ID);
+	EXPECT_EQ(status, K_DEVJSON_PROTOCOL_PARSE_SUCCESS);
+	EXPECT_STREQ(output_string, R"({"id":12,"res":{"get":{"key1":"test1","key2":"test2"},"set":{"key1":"value1"},"cmd":{"c1":true,"c5":false}}})");
 }
 
 TEST(KDevJsonProtocol, IDNotRequiredParseSuccessWithNoID)
